@@ -5,10 +5,11 @@
 #include "argparse.h"
 
 #define eprintf(_fmt, ...)  fprintf(stderr, _fmt, __VA_ARGS__)
-#define desc_size 32
+#define unused              __attribute__((unused))
+#define desc_size           32
 
 static void
-mycb(const char *val, void *ctx __attribute__((unused)))
+mycb(const char *val, unused void *ctx)
 {
     if (val != NULL)
         printf("%s\n", val);
@@ -23,12 +24,23 @@ mycb(const char *val, void *ctx __attribute__((unused)))
 }
 
 static void
-errcb(const char *val, arg_error err, void *ctx __attribute__((unused)))
+errcb(const char *val, arg_error err, unused void *ctx)
 {
-    if (val != NULL && err == ARG_UNKNOWN)
-        eprintf("Unknown option: %s\n", val);
+    if (val != NULL)
+    {
+        if (err == ARG_UNKNOWN)
+            eprintf("Unknown option: %s\n", val);
+
+        else if (err == ARG_MALFORMED)
+            eprintf("Malformed option: %s\n", val);
+
+        else if (err == ARG_MISSING)
+            eprintf("Missing argument for option: %s\n", val);
+    }
     else
-        eprintf("Error: %s\n", val);
+        eprintf("%s\n", "Error");
+
+    exit(1);
 }
 
 int

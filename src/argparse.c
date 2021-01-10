@@ -71,7 +71,7 @@ argparse(struct args *_args, bool fail_fast)
                                 }
                             }
 
-                            if ((val = _args->argv[i]) == NULL)
+                            if (_args->argv[i] == NULL || _args->argv[i][0] == '-')
                             {
                                 call_cb(_args->err_cb, arg, ARG_MISSING, _args->ctx);
 
@@ -82,6 +82,10 @@ argparse(struct args *_args, bool fail_fast)
                                     ret = ARG_MISSING;
                                     goto _continue;
                                 }
+                            }
+                            else
+                            {
+                                val = _args->argv[i];
                             }
                         }
                     }
