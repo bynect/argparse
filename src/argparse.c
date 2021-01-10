@@ -24,13 +24,14 @@ argparse(struct args *_args, bool fail_fast)
     bool known, single;
     arg_error ret = ARG_SUCCESS;
 
-    for (i = 0; i < _args->argc; ++i)
+    for (i = 1; i < _args->argc; ++i)
     {
         char *arg = _args->argv[i];
+
+        if (arg == NULL) continue;
+
         const int len = strlen(arg);
         unsigned int offset = 1;
-
-        if (arg == NULL) break;
 
         single = true;
         if (arg[0] == '-')
