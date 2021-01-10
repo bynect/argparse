@@ -6,14 +6,15 @@
 #define call_cb(_cb, ...)   if (_cb != NULL) _cb(__VA_ARGS__)
 
 void
-init_args(struct args *_args, struct args_description *desc,
-        int desc_len, int argc, char **argv, error_cb err_cb)
+init_args(struct args *_args, struct arg_description *desc,
+        int desc_len, int argc, char **argv, error_cb err_cb, void *ctx)
 {
     _args->desc = desc;
     _args->desc_len = desc_len;
     _args->argc = argc;
     _args->argv = argv;
     _args->err_cb = err_cb;
+    _args->ctx = ctx;
 }
 
 arg_error
@@ -25,7 +26,7 @@ argparse(struct args *_args, bool fail_fast)
 
     for (i = 0; i < _args->argc; ++i)
     {
-        const char *arg = _args->argv[i];
+        char *arg = _args->argv[i];
         const int len = strlen(arg);
         unsigned int offset = 1;
 
@@ -59,7 +60,7 @@ argparse(struct args *_args, bool fail_fast)
                         {
                             if (++i > _args->argc)
                             {
-                                call_cb(_args->err_cb, arg, ARG_MISSING);
+                                call_cb(_args->err_cb, arg, ARG_MISSING, _args->ctx);
 
                                 if (fail_fast)
                                     return ARG_MISSING;
@@ -72,7 +73,7 @@ argparse(struct args *_args, bool fail_fast)
 
                             if ((val = _args->argv[i]) == NULL)
                             {
-                                call_cb(_args->err_cb, arg, ARG_MISSING);
+                                call_cb(_args->err_cb, arg, ARG_MISSING, _args->ctx);
 
                                 if (fail_fast)
                                     return ARG_MISSING;
@@ -90,7 +91,7 @@ argparse(struct args *_args, bool fail_fast)
                         {
                             if (offset + desc_len > len)
                             {
-                                call_cb(_args->err_cb, arg, ARG_MALFORMED);
+                                call_cb(_args->err_cb, arg, ARG_MALFORMED, _args->ctx);
 
                                 if (fail_fast)
                                     return ARG_MALFORMED;
@@ -111,14 +112,14 @@ argparse(struct args *_args, bool fail_fast)
                         }
                     }
 
-                    call_cb(_args->desc[j].cb, val);
+                    call_cb(_args->desc[j].cb, val, _args->ctx);
                     break;
                 }
             }
 
             if (!known)
             {
-                call_cb(_args->err_cb, arg, ARG_UNKNOWN);
+                call_cb(_args->err_cb, arg, ARG_UNKNOWN, _args->ctx);
 
                 if (fail_fast)
                     return ARG_UNKNOWN;

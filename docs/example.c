@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "argparse.h"
 
@@ -7,19 +8,22 @@
 #define desc_size 32
 
 static void
-mycb(const char *val)
+mycb(const char *val, void *ctx __attribute__((unused)))
 {
     if (val != NULL)
         printf("%s\n", val);
     else
+    {
         printf(
             "--help, -h      print this message\n"
             "--echo          print its argument\n"
         );
+        exit(0);
+    }
 }
 
 static void
-errcb(const char *val, arg_error err)
+errcb(const char *val, arg_error err, void *ctx __attribute__((unused)))
 {
     if (val != NULL && err == ARG_UNKNOWN)
         eprintf("Unknown option: %s\n", val);
@@ -30,8 +34,8 @@ errcb(const char *val, arg_error err)
 int
 main(int argc, char **argv)
 {
-    struct args_description desc[desc_size];
-    memset(desc, 0, desc_size * sizeof(struct args_description));
+    struct arg_description desc[desc_size];
+    memset(desc, 0, desc_size * sizeof(struct arg_description));
 
     desc[0].lname = "help";
     desc[0].sname = "h";
@@ -43,7 +47,7 @@ main(int argc, char **argv)
     desc[1].cb = &mycb;
 
     struct args _args;
-    init_args(&_args, desc, desc_size, argc, argv, &errcb);
+    init_args(&_args, desc, desc_size, argc, argv, &errcb, NULL);
 
     return argparse(&_args, false);
 }

@@ -12,10 +12,10 @@ typedef enum
     ARG_UNKNOWN,
 } arg_error;
 
-typedef void (*arg_cb)(const char *val);
-typedef void (*error_cb)(const char *val, arg_error err);
+typedef void (*arg_cb)(const char *val, void *ctx);
+typedef void (*error_cb)(const char *val, arg_error err, void *ctx);
 
-struct args_description
+struct arg_description
 {
     char *lname;
     char *sname;
@@ -25,15 +25,16 @@ struct args_description
 
 struct args
 {
-    struct args_description *desc;
+    struct arg_description *desc;
     unsigned int desc_len;
     char **argv;
     int argc;
     error_cb err_cb;
+    void *ctx;
 };
 
-void init_args(struct args *_args, struct args_description *desc,
-            int desc_len, int argc, char **argv, error_cb err_cb);
+void init_args(struct args *_args, struct arg_description *desc, int desc_len,
+            int argc, char **argv, error_cb err_cb, void *ctx);
 
 arg_error argparse(struct args *_args, bool fail_fast);
 
