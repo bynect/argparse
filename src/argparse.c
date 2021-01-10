@@ -1,3 +1,11 @@
+/*
+ * Copyright 2020-2021 @bynect
+ *
+ * This is free and open source software.
+ * You can use/modify/redistribute it under the terms of the MIT license.
+ * See docs/LICENSE for for more details.
+ */
+
 #include <stdio.h>
 #include <string.h>
 
