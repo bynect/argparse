@@ -27,7 +27,7 @@ mycb(const char *val, unused void *ctx)
             "--help, -h      print this message\n"
             "--echo          print its argument\n"
         );
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 }
 
@@ -36,19 +36,28 @@ errcb(const char *val, arg_error err, unused void *ctx)
 {
     if (val != NULL)
     {
-        if (err == ARG_UNKNOWN)
-            eprintf("Unknown option: %s\n", val);
+        switch (err) {
+            case ARG_UNKNOWN:
+                eprintf("Unknown option: %s\n", val);
+                break;
 
-        else if (err == ARG_MALFORMED)
-            eprintf("Malformed option: %s\n", val);
+            case ARG_MALFORMED:
+                eprintf("Malformed option: %s\n", val);
+                break;
 
-        else if (err == ARG_MISSING)
-            eprintf("Missing argument for option: %s\n", val);
+            case ARG_MISSING:
+                eprintf("Missing argument for option: %s\n", val);
+                break;
+
+            default:
+                eprintf("Error on option: %s\n", val);
+                break;
+        }
     }
     else
         eprintf("%s\n", "Error");
 
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 int
